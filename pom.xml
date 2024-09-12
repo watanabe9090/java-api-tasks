@@ -32,6 +32,7 @@
 		<micrometer.version>1.13.3</micrometer.version>
 		<testcontainers.version>1.20.1</testcontainers.version>
 		<rest-assured.version>5.5.0</rest-assured.version>
+		<commons-lang3.version>3.14.0</commons-lang3.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -100,6 +101,11 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 			<version>${micrometer.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons-lang3.version}</version>
 		</dependency>
 	</dependencies>
 

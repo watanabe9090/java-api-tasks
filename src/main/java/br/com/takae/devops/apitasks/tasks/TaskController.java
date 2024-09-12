@@ -1,17 +1,22 @@
 package br.com.takae.devops.apitasks.tasks;
 
-import br.com.takae.devops.apitasks.general.APIBadRequestException;
-import br.com.takae.devops.apitasks.general.APIRoleDeniedException;
-import br.com.takae.devops.apitasks.general.AuthUtils;
+import br.com.takae.devops.apitasks.general.*;
 import br.com.takae.devops.apitasks.tasks.dto.REQDeleteTask;
 import br.com.takae.devops.apitasks.tasks.dto.REQSaveTask;
 import br.com.takae.devops.apitasks.tasks.dto.REQUpdateTask;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
@@ -24,10 +29,17 @@ public class TaskController {
     private ResponseEntity<Page<Task>> getAllTasks(
             @RequestHeader("X-Auth-Username") String username,
             @RequestHeader(value = "X-Auth-Role", required = false) String role,
-            Pageable pageable
-    ) {
+            @PageableDefault(sort = {"id"}) Pageable pageable
+    ) throws BadRequestException {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
             throw new APIRoleDeniedException();
+        }
+        /**
+         * ToDo: Find a way to handle it before coyote.BadRequestException
+         */
+        List<Sort.Order> invalidSortStatements = PageableUtils.getInvalidSortStatements(pageable, Task.class);
+        if(!invalidSortStatements.isEmpty()) {
+            throw new BadRequestException(StringUtils.join(invalidSortStatements.stream().map(Sort.Order::getProperty), ","));
         }
         Page<Task> tasks = service.getAll(username, pageable);
         return new ResponseEntity<>(tasks, HttpStatus.OK);
@@ -78,8 +90,11 @@ public class TaskController {
     }
 
     @ExceptionHandler(value = APIBadRequestException.class)
-    public ResponseEntity<Void> handleAPIBadRequestException(APIBadRequestException ex) {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponse> handleAPIBadRequestException(APIBadRequestException ex) {
+        ErrorResponse response = new ErrorResponse();
+        response.setMessage(ex.getMessage());
+        response.setCause(ex.getLocalizedMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
 
