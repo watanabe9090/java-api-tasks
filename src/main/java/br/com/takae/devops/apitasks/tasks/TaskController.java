@@ -23,7 +23,7 @@ public class TaskController {
     @GetMapping
     private ResponseEntity<Page<Task>> getAllTasks(
             @RequestHeader("X-Auth-Username") String username,
-            @RequestHeader("X-Auth-Role") String role,
+            @RequestHeader(value = "X-Auth-Role", required = false) String role,
             Pageable pageable
     ) {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
@@ -36,7 +36,7 @@ public class TaskController {
     @PostMapping
     private ResponseEntity<Void> saveTask(
             @RequestHeader("X-Auth-Username") String username,
-            @RequestHeader("X-Auth-Role") String role,
+            @RequestHeader(value = "X-Auth-Role", required = false) String role,
             @RequestBody REQSaveTask dto
     ) {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
@@ -49,7 +49,7 @@ public class TaskController {
     @PutMapping
     private ResponseEntity<Void> updateTask(
             @RequestHeader("X-Auth-Username") String username,
-            @RequestHeader("X-Auth-Role") String role,
+            @RequestHeader(value = "X-Auth-Role", required = false) String role,
             @RequestBody REQUpdateTask dto
     ) throws Exception {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
@@ -62,7 +62,7 @@ public class TaskController {
     @DeleteMapping
     private ResponseEntity<Void> deleteTask(
             @RequestHeader("X-Auth-Username") String username,
-            @RequestHeader("X-Auth-Role") String role,
+            @RequestHeader(value = "X-Auth-Role", required = false) String role,
             @RequestBody REQDeleteTask dto
     ) {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
