@@ -1,0 +1,40 @@
+server:
+  port: 9092
+spring:
+  application:
+    name: api-tasks
+  datasource:
+    url: jdbc:postgresql://localhost:5432/api-tasks
+    username: postgres
+    password: example
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    br: DEBUG
+
+management:
+  metrics:
+    enable:
+      jvm: true
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      sla:
+        http:
+          server:
+            requests: 50ms,100ms,200ms,300ms
+    tags:
+      application: api-tasks
+  endpoints:
+    health:
+      show-details: always
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
