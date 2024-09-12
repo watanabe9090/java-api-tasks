@@ -33,6 +33,8 @@
 		<testcontainers.version>1.20.1</testcontainers.version>
 		<rest-assured.version>5.5.0</rest-assured.version>
 		<commons-lang3.version>3.14.0</commons-lang3.version>
+		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -44,6 +46,11 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate-validator.version}</version>
 		</dependency>
 
 		<!-- DATABASE RELATED -->

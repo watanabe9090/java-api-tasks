@@ -4,6 +4,7 @@ import br.com.takae.devops.apitasks.general.*;
 import br.com.takae.devops.apitasks.tasks.dto.REQDeleteTask;
 import br.com.takae.devops.apitasks.tasks.dto.REQSaveTask;
 import br.com.takae.devops.apitasks.tasks.dto.REQUpdateTask;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.BadRequestException;
@@ -15,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -32,7 +32,7 @@ public class TaskController {
             @PageableDefault(sort = {"id"}) Pageable pageable
     ) throws BadRequestException {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
-            throw new APIRoleDeniedException();
+            throw new APIRoleDeniedException("%s doesn't have the necessary privileges to perform the task");
         }
         /**
          * ToDo: Find a way to handle it before coyote.BadRequestException
@@ -49,10 +49,10 @@ public class TaskController {
     private ResponseEntity<Void> saveTask(
             @RequestHeader("X-Auth-Username") String username,
             @RequestHeader(value = "X-Auth-Role", required = false) String role,
-            @RequestBody REQSaveTask dto
+            @RequestBody @Valid REQSaveTask dto
     ) {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
-            throw new APIRoleDeniedException();
+            throw new APIRoleDeniedException("%s doesn't have the necessary privileges to perform the task");
         }
         service.save(username, dto);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -62,10 +62,10 @@ public class TaskController {
     private ResponseEntity<Void> updateTask(
             @RequestHeader("X-Auth-Username") String username,
             @RequestHeader(value = "X-Auth-Role", required = false) String role,
-            @RequestBody REQUpdateTask dto
+            @RequestBody @Valid REQUpdateTask dto
     ) throws Exception {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
-            throw new APIRoleDeniedException();
+            throw new APIRoleDeniedException("%s doesn't have the necessary privileges to perform the task");
         }
         service.update(username, dto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -75,10 +75,10 @@ public class TaskController {
     private ResponseEntity<Void> deleteTask(
             @RequestHeader("X-Auth-Username") String username,
             @RequestHeader(value = "X-Auth-Role", required = false) String role,
-            @RequestBody REQDeleteTask dto
+            @RequestBody @Valid REQDeleteTask dto
     ) {
         if (!AuthUtils.hasNecessaryRole("USER", role)) {
-            throw new APIRoleDeniedException();
+            throw new APIRoleDeniedException("%s doesn't have the necessary privileges to perform the task");
         }
         service.delete(username, dto.getId());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -86,6 +86,8 @@ public class TaskController {
 
     @ExceptionHandler(value = APIRoleDeniedException.class)
     public ResponseEntity<Void> handleAPIRoleDeniedException(APIRoleDeniedException ex) {
+        ErrorResponse response = new ErrorResponse();
+        response.setMessage(ex.getMessage());
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
@@ -93,7 +95,7 @@ public class TaskController {
     public ResponseEntity<ErrorResponse> handleAPIBadRequestException(APIBadRequestException ex) {
         ErrorResponse response = new ErrorResponse();
         response.setMessage(ex.getMessage());
-        response.setCause(ex.getLocalizedMessage());
+        response.setDeveloperMessage(ex.getLocalizedMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
