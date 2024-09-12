@@ -24,9 +24,6 @@ public class TaskService {
     }
 
     public Task save(String username, REQSaveTask dto) {
-        if(dto.getName() == null || dto.getName().isEmpty() || dto.getName().isBlank()) {
-            throw new APIBadRequestException();
-        }
         Task newTask = new Task();
         Date createdAt = new Date();
         newTask.setName(dto.getName());
@@ -43,7 +40,7 @@ public class TaskService {
     public Task update(String username, REQUpdateTask dto) throws Exception {
         Optional<Task> optTask = repository.findByAccountUsernameAndId(username, dto.getId());
         if (optTask.isEmpty()) {
-            throw new APIBadRequestException();
+            throw new APIBadRequestException("no task found with id %d", dto.getId());
         }
         Task task = optTask.get();
         if (dto.getName() != null && !dto.getName().isEmpty() && !dto.getName().isBlank()) {

@@ -1,4 +1,4 @@
-package br.com.takae.devops.apitasks.general;
+package br.com.takae.devops.apitasks.filters;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
